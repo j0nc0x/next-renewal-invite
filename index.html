@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Join a List · next renewal</title>
+<link rel="icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ground: #F2F2F4; --card: #FFFFFF; --line: #E4E4E7; --text: #18181B; --muted: #5F5F6B;
+    --accent: #C2410C; --on-accent: #FFFFFF;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground: #0B0B0D; --card: #18181B; --line: #2A2A30; --text: #F4F4F5; --muted: #A1A1AA;
+      --accent: #FB923C; --on-accent: #18181B;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    padding: 24px 16px; background: var(--ground); color: var(--text);
+    font: 400 15px/21px 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
+  main {
+    width: 100%; max-width: 380px; background: var(--card); border: 1px solid var(--line);
+    border-radius: 20px; padding: 28px 24px; text-align: center;
+  }
+  img { width: 72px; height: 72px; border-radius: 18px; }
+  h1 { font-weight: 800; font-size: 24px; line-height: 30px; letter-spacing: -0.5px; margin: 16px 0 6px; }
+  p { margin: 0; color: var(--muted); }
+  .code {
+    margin: 20px 0; padding: 12px; border-radius: 12px; background: var(--ground);
+    font-weight: 700; font-size: 22px; letter-spacing: 3px; font-variant-numeric: tabular-nums;
+  }
+  .button {
+    display: block; padding: 14px; border-radius: 999px; background: var(--accent); color: var(--on-accent);
+    font-weight: 700; text-decoration: none;
+  }
+  .help { margin-top: 20px; font-size: 13px; line-height: 18px; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <img src="icon.png" alt="">
+  <div id="invite" hidden>
+    <h1>Join a List</h1>
+    <p>You've been invited to a List in next renewal.</p>
+    <div class="code" id="code"></div>
+    <a class="button" id="open" href="#">Open in next renewal</a>
+    <p class="help">
+      Nothing happened? Open next renewal, go to <strong>Lists → Join</strong> and enter the code above.
+      The code works once and expires 7 days after it was sent.
+    </p>
+  </div>
+  <div id="missing" hidden>
+    <h1>This link is incomplete</h1>
+    <p>Its code is missing or mistyped. Ask the person who invited you to send it again.</p>
+  </div>
+</main>
+<script>
+  // Invite codes: 10 characters from A–Z and 2–9, without the lookalikes 0, O, 1 and I.
+  var params = new URLSearchParams(location.search);
+  var code = (params.get('code') || '').trim().toUpperCase();
+  var dev = params.get('app') === 'dev';
+
+  if (/^[A-HJ-NP-Z2-9]{10}$/.test(code)) {
+    var app = dev
+      ? { scheme: 'nextrenewal-dev', pkg: 'com.joncox.nextrenewal.dev' }
+      : { scheme: 'nextrenewal', pkg: 'com.joncox.nextrenewal' };
+    var fallback = dev ? '' : ';S.browser_fallback_url=' +
+      encodeURIComponent('https://play.google.com/store/apps/details?id=' + app.pkg);
+    document.getElementById('code').textContent = code;
+    document.getElementById('open').href =
+      'intent://invite/' + code + '#Intent;scheme=' + app.scheme + ';package=' + app.pkg + fallback + ';end';
+    document.getElementById('invite').hidden = false;
+  } else {
+    document.getElementById('missing').hidden = false;
+  }
+</script>
+</body>
+</html>
